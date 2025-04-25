@@ -1,0 +1,43 @@
+name: Deploy Documentation
+
+# Controls when the workflow will run
+on:
+  push:
+    branches:
+      - main # Ejecuta cuando se hace push a la rama main
+  pull_request:
+    branches:
+      - main # Ejecuta cuando se hace un PR a la rama main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Set up Ruby (Si usas Jekyll, este paso es necesario)
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0' # Ajusta según tu versión de Ruby
+
+    # Install dependencies (Si usas Jekyll, necesitarás bundler y jekyll)
+    - name: Install dependencies
+      run: |
+        gem install bundler
+        bundle install
+
+    # Build your site (esto es necesario si usas Jekyll para generar tu sitio)
+    - name: Build site
+      run: |
+        bundle exec jekyll build
+
+    # Deploy to GitHub Pages (sube el contenido generado al branch gh-pages)
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site  # Asegúrate de que el directorio _site es el correcto si usas Jekyll
